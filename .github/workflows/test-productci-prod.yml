@@ -1,0 +1,70 @@
+name: Product CI Prod
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  crud-test:
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:8
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Start Product API
+        env:
+          MONGO_URI: mongodb://localhost:27017/productdb
+          PORT: 3000
+        run: |
+          npm start > server.log 2>&1 &
+          for i in {1..15}; do
+            if curl -fsS http://localhost:3000/health; then
+              exit 0
+            fi
+            sleep 2
+          done
+          cat server.log
+          exit 1
+
+      - name: Create product
+        run: |
+          curl -fsS -X POST http://localhost:3000/api/products \
+            -H "Content-Type: application/json" \
+            -d '{"pid":"CI001","pname":"CI Product","price":100000,"quantity":10}'
+
+      - name: Read products
+        run: |
+          curl -fsS http://localhost:3000/api/products
+
+      - name: Update product
+        run: |
+          curl -fsS -X PUT http://localhost:3000/api/products/CI001 \
+            -H "Content-Type: application/json" \
+            -d '{"pname":"CI Product Updated","price":120000,"quantity":20}'
+
+      - name: Delete product
+        run: |
+          curl -fsS -X DELETE http://localhost:3000/api/products/CI001
