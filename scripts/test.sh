@@ -1,8 +1,7 @@
-#!bin/bash
+#!/bin/bash
 set -e
-echo "Test script for product-api"
 
-curl -fsS http://localhost:3000/health
-
+echo "Running API tests"
+curl -fsS http://localhost:3000/healthy
 echo ""
-echo "CI/CD passe"
+echo "API tests passed"
