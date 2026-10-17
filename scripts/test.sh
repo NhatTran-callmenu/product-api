@@ -1,9 +1,8 @@
-#!/bin/bash
+#!bin/bash
 set -e
-
-echo "Testing Product API..."
+echo "Test script for product-api"
 
 curl -fsS http://localhost:3000/health
 
 echo ""
-echo "CI/CD TEST PASSED!"
+echo "CI/CD passe"

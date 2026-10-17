@@ -89,4 +89,4 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/product-api:latest
       - name: Test API
-        run: bash scripts/test.sh
+        run: bash ./scripts/test.sh
