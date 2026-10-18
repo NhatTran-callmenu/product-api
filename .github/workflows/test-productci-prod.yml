@@ -48,7 +48,8 @@ jobs:
           done
           cat server.log
           exit 1
-
+      - name :Test API
+        run: bash scripts/test.sh
       - name: Create product
         run: |
           curl -fsS -X POST http://localhost:3000/api/products \
