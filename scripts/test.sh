@@ -2,4 +2,6 @@
 set -e
 echo "Running tests"
 
-curl -fs
+curl -fsS http://localhost:3000/health 
+echo ""
+echo "Tests completed successfully"
